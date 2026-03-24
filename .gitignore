@@ -5,6 +5,12 @@ node_modules/
 .env*.local
 *.tsbuildinfo
 next-env.d.ts
-node_modules
 对话记录.md
 .claude/
+# Source images in root (processed copies are in public/)
+/0_1.png
+/logo-old.png
+/logo-src.png
+/qrcode-src.jpg
+/novaelena_*.png
+/阿真Irene*.jpg
