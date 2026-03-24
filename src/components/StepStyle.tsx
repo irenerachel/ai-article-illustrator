@@ -4,7 +4,14 @@ import { VISUAL_STYLES, COLOR_TONES, ASPECT_RATIOS, EXTENDED_RATIOS, IMAGE_MODEL
 import type { StylePreset } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Wand2, Loader2, BookmarkPlus, Trash2, Upload, FileText, Save, FolderOpen, ImageIcon, X, Sparkles } from "lucide-react";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
+
+const WAIT_JOKES = [
+  "AI 正在认真看你的文章，比你的读者还认真...",
+  "提示词工程师正在加班，请给它一杯咖啡的时间 ☕",
+  "据说等待的时候想一个冷笑话，时间会过得更快。好吧我编不出来。",
+  "你知道吗？AI 生成一张图的时间，刚好够你喝一口水 💧",
+];
 
 export function StepStyle() {
   const { state, dispatch } = useApp();
@@ -16,6 +23,13 @@ export function StepStyle() {
   const [skillName, setSkillName] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [jokeIndex, setJokeIndex] = useState(0);
+
+  useEffect(() => {
+    if (!isProcessing) return;
+    const timer = setInterval(() => setJokeIndex(i => (i + 1) % WAIT_JOKES.length), 4000);
+    return () => clearInterval(timer);
+  }, [isProcessing]);
   const fileRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLInputElement>(null);
   const dragCounterRef = useRef(0);
@@ -399,6 +413,14 @@ export function StepStyle() {
           </div>
         )}
       </div>
+
+      {/* Loading hint with jokes */}
+      {isProcessing && (
+        <div className="rounded-2xl border bg-foreground/[0.02] p-4 text-center space-y-2">
+          <Loader2 className="h-5 w-5 animate-spin mx-auto text-muted-foreground" />
+          <p className="text-sm text-muted-foreground transition-opacity duration-500">{WAIT_JOKES[jokeIndex]}</p>
+        </div>
+      )}
 
       {/* Error */}
       {state.error && (
