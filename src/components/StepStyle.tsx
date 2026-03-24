@@ -416,7 +416,7 @@ export function StepStyle() {
 
       {/* Loading hint with jokes */}
       {isProcessing && (
-        <p className="text-sm text-muted-foreground text-center py-2">{WAIT_JOKES[jokeIndex]}</p>
+        <p className="text-xs text-muted-foreground text-center">{WAIT_JOKES[jokeIndex]}</p>
       )}
 
       {/* Error */}
