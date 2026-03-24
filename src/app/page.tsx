@@ -69,10 +69,32 @@ export default function Home() {
         <AppSidebar />
         <main ref={mainRef} onScroll={handleScroll} className="flex-1 overflow-y-auto relative">
           <SubtleDots />
-          {/* Mobile header */}
-          <div className="md:hidden flex items-center gap-3 px-4 py-3 border-b bg-card sticky top-0 z-10">
-            <img src="/logo.png" alt="" className="h-8 w-8 rounded-lg object-cover" />
-            <span className="font-bold text-sm">AI Article Illustrator</span>
+          {/* Mobile header with step nav */}
+          <div className="md:hidden sticky top-0 z-10 bg-card border-b">
+            <div className="flex items-center justify-between px-4 py-2">
+              <div className="flex items-center gap-2">
+                <img src="/logo.png" alt="" className="h-7 w-7 rounded-lg object-cover" />
+                <span className="font-bold text-xs">AI Illustrator</span>
+              </div>
+              <div className="flex items-center gap-1">
+                {([1, 2, 3, 4] as const).map(s => (
+                  <button
+                    key={s}
+                    onClick={() => {
+                      if (s === 1) dispatch({ type: "SET_STEP", step: s });
+                      else if (s === 2 && state.apiConfig.textApiKey) dispatch({ type: "SET_STEP", step: s });
+                      else if (s === 3 && state.apiConfig.textApiKey && state.articleText.trim()) dispatch({ type: "SET_STEP", step: s });
+                      else if (s === 4 && state.segments.length > 0) dispatch({ type: "SET_STEP", step: s });
+                    }}
+                    className={`h-7 w-7 rounded-full text-[10px] font-bold transition-colors ${
+                      state.step === s ? "bg-foreground text-background" : state.step > s ? "bg-muted text-foreground" : "bg-muted/50 text-muted-foreground"
+                    }`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
           <div className="max-w-[900px] mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-10 relative" style={{ zIndex: 1 }}>
             {state.step === 1 && <StepApi />}
@@ -81,7 +103,7 @@ export default function Home() {
             {state.step === 4 && <StepResults />}
           </div>
           {/* QR code hover */}
-          <div className="fixed top-5 right-4 sm:right-10 z-50 group">
+          <div className="fixed top-5 right-5 sm:right-10 z-50 group hidden sm:block">
             <span className="text-xs text-muted-foreground cursor-default select-none">
               关注@阿真Irene
             </span>
@@ -98,7 +120,7 @@ export default function Home() {
           {showTop && (
             <button
               onClick={() => mainRef.current?.scrollTo({ top: 0, behavior: "smooth" })}
-              className="fixed bottom-6 right-4 sm:right-10 z-50 h-10 w-10 rounded-full bg-foreground text-background flex items-center justify-center shadow-lg hover:opacity-80 transition-opacity"
+              className="fixed bottom-6 right-5 sm:right-10 z-50 h-10 w-10 rounded-full bg-foreground text-background flex items-center justify-center shadow-lg hover:opacity-80 transition-opacity"
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3L3 8h3v5h4V8h3L8 3z" fill="currentColor"/></svg>
             </button>
