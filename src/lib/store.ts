@@ -39,7 +39,29 @@ export type AppAction =
   | { type: "SET_INFOGRAPHIC_MODE"; value: boolean }
   | { type: "RESET" };
 
-function persist(k: string, v: unknown) { if (typeof window !== "undefined") localStorage.setItem(k, JSON.stringify(v)); }
+function persist(k: string, v: unknown) {
+  if (typeof window === "undefined") return;
+  try {
+    const json = JSON.stringify(v);
+    // Skip saving if data is too large (>2MB) to prevent page freeze
+    if (json.length > 2 * 1024 * 1024) {
+      // For segments, strip image data before saving
+      if (k === "av_segments" && Array.isArray(v)) {
+        const light = (v as Segment[]).map(s => ({ ...s, imageUrl: undefined, imageHistory: undefined }));
+        localStorage.setItem(k, JSON.stringify(light));
+        return;
+      }
+      return; // skip other oversized data
+    }
+    localStorage.setItem(k, json);
+  } catch {
+    // localStorage full, clean up segments images
+    try {
+      localStorage.removeItem("av_segments");
+      localStorage.removeItem("av_style_lock");
+    } catch {}
+  }
+}
 
 export const initialState: AppState = {
   step: 1,
