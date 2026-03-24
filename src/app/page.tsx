@@ -33,6 +33,12 @@ export default function Home() {
       }
       const skillImage = localStorage.getItem("av_skill_image");
       if (skillImage) dispatch({ type: "SET_SKILL_IMAGE", dataUrl: JSON.parse(skillImage) });
+      const segments = localStorage.getItem("av_segments");
+      const styleLock = localStorage.getItem("av_style_lock");
+      if (segments) {
+        const parsed = JSON.parse(segments);
+        if (parsed.length > 0) dispatch({ type: "SET_SEGMENTS", segments: parsed, styleLock: styleLock ? JSON.parse(styleLock) : "" });
+      }
       const savedSkills = localStorage.getItem("av_saved_skills");
       if (savedSkills) JSON.parse(savedSkills).forEach((s: import("@/lib/types").SavedSkill) => dispatch({ type: "SAVE_SKILL", skill: s }));
       const presets = localStorage.getItem("av_presets");

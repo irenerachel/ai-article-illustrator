@@ -416,10 +416,7 @@ export function StepStyle() {
 
       {/* Loading hint with jokes */}
       {isProcessing && (
-        <div className="rounded-2xl border bg-foreground/[0.02] p-4 text-center space-y-2">
-          <Loader2 className="h-5 w-5 animate-spin mx-auto text-muted-foreground" />
-          <p className="text-sm text-muted-foreground transition-opacity duration-500">{WAIT_JOKES[jokeIndex]}</p>
-        </div>
+        <p className="text-sm text-muted-foreground text-center py-2">{WAIT_JOKES[jokeIndex]}</p>
       )}
 
       {/* Error */}

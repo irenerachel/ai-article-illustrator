@@ -104,9 +104,9 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     }
     case "SET_SEGMENTING": return { ...state, isSegmenting: action.value, error: null };
     case "SET_GENERATING_PROMPTS": return { ...state, isGeneratingPrompts: action.value, error: null };
-    case "SET_SEGMENTS": return { ...state, segments: action.segments, styleLock: action.styleLock, step: 4 };
+    case "SET_SEGMENTS": { persist("av_segments", action.segments); persist("av_style_lock", action.styleLock); return { ...state, segments: action.segments, styleLock: action.styleLock, step: 4 }; }
     case "ADD_SEGMENT": return { ...state, segments: [...state.segments, action.segment] };
-    case "UPDATE_SEGMENT": return { ...state, segments: state.segments.map(s => s.id === action.id ? { ...s, ...action.updates } : s) };
+    case "UPDATE_SEGMENT": { const segs = state.segments.map(s => s.id === action.id ? { ...s, ...action.updates } : s); persist("av_segments", segs); return { ...state, segments: segs }; }
     case "SPLIT_SEGMENT": { const idx = state.segments.findIndex(s => s.id === action.id); if (idx === -1) return state; const segs = [...state.segments]; segs.splice(idx, 1, ...action.newSegments); return { ...state, segments: segs }; }
     case "DELETE_SEGMENT": return { ...state, segments: state.segments.filter(s => s.id !== action.id) };
     case "SET_ERROR": return { ...state, error: action.error, isSegmenting: false, isGeneratingPrompts: false };
