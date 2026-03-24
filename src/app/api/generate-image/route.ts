@@ -49,9 +49,10 @@ async function generateVolcengine(prompt: string, model: string, aspectRatio: st
     watermark: watermark ?? false,
   };
 
-  // Seedream supports image-to-image via the "image" field
+  // Seedream: pass reference image + enable sequential mode for character consistency
   if (refImageDataUrl) {
     body.image = refImageDataUrl;
+    body.sequential_image_generation = "auto";
   }
 
   const res = await fetch("https://ark.cn-beijing.volces.com/api/v3/images/generations", {
