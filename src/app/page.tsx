@@ -93,7 +93,7 @@ export default function Home() {
           {showTop && (
             <button
               onClick={() => mainRef.current?.scrollTo({ top: 0, behavior: "smooth" })}
-              className="fixed bottom-6 right-6 z-50 h-10 w-10 rounded-full bg-foreground text-background flex items-center justify-center shadow-lg hover:opacity-80 transition-opacity"
+              className="fixed bottom-6 right-10 z-50 h-10 w-10 rounded-full bg-foreground text-background flex items-center justify-center shadow-lg hover:opacity-80 transition-opacity"
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3L3 8h3v5h4V8h3L8 3z" fill="currentColor"/></svg>
             </button>
