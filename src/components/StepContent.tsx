@@ -121,7 +121,7 @@ export function StepContent() {
       </div>
 
       {/* Mode Toggle */}
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <button
           onClick={() => dispatch({ type: "SET_ILLUSTRATION_MODE", mode: "full" })}
           className={`flex-1 flex items-center gap-3 p-4 rounded-2xl border-2 transition-all ${

@@ -69,7 +69,7 @@ export function AppSidebar() {
   return (
     <aside
       ref={sidebarRef}
-      className="bg-card border-r flex flex-col h-full shrink-0 relative select-none"
+      className="bg-card border-r flex-col h-full shrink-0 relative select-none hidden md:flex"
       style={{ width: currentWidth, minWidth: currentWidth }}
     >
       {/* Logo */}

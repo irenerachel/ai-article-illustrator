@@ -205,9 +205,9 @@ export function SegmentCard({ segment, index, total }: { segment: Segment; index
 
           {segment.prompt && (
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold">{lang === "zh" ? "配图提示词" : "Image Prompt"}</span>
-                <div className="flex items-center gap-1">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                <span className="text-xs font-bold shrink-0">{lang === "zh" ? "配图提示词" : "Image Prompt"}</span>
+                <div className="flex items-center gap-1 flex-wrap">
                   {hasImageKey && !segment.isGeneratingImage && (
                     <>
                       {/* Subject toggle */}

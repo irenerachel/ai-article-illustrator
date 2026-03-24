@@ -246,7 +246,7 @@ export function StepStyle() {
 
       {/* Style Selectors */}
       <div className="bg-card rounded-2xl border p-6">
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {fields.map(({ key, label, options }) => (
             <div key={key} className="space-y-1.5">
               <span className="text-xs font-semibold text-muted-foreground">{label}</span>

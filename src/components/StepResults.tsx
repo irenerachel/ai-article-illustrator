@@ -331,13 +331,13 @@ export function StepResults() {
       {/* Toolbar */}
       <div className="bg-card rounded-2xl border px-5 py-4 space-y-3">
         {/* Row 1: Info + primary action */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm font-bold">{state.segments.length} {lang === "zh" ? "个段落" : "segments"}</span>
             {state.styleLock && <Badge variant="secondary" className="text-xs rounded-lg">{state.styleLock}</Badge>}
             {selectedModel && <Badge variant="outline" className="text-xs rounded-lg">{selectedModel.name}</Badge>}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             {hasImageKey && pendingSegments.length > 0 && !isBatchGenerating && (
               <Button size="sm" className="rounded-lg bg-foreground text-background hover:opacity-90" disabled={isAnyGenerating} onClick={handleGenerateAllImages}>
                 <ImageIcon className="h-3.5 w-3.5 mr-1.5" />{lang === "zh" ? "生成全部配图" : "Generate All"}

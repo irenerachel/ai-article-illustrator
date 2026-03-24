@@ -69,14 +69,19 @@ export default function Home() {
         <AppSidebar />
         <main ref={mainRef} onScroll={handleScroll} className="flex-1 overflow-y-auto relative">
           <SubtleDots />
-          <div className="max-w-[900px] mx-auto px-8 py-10 relative" style={{ zIndex: 1 }}>
+          {/* Mobile header */}
+          <div className="md:hidden flex items-center gap-3 px-4 py-3 border-b bg-card sticky top-0 z-10">
+            <img src="/logo.png" alt="" className="h-8 w-8 rounded-lg object-cover" />
+            <span className="font-bold text-sm">AI Article Illustrator</span>
+          </div>
+          <div className="max-w-[900px] mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-10 relative" style={{ zIndex: 1 }}>
             {state.step === 1 && <StepApi />}
             {state.step === 2 && <StepContent />}
             {state.step === 3 && <StepStyle />}
             {state.step === 4 && <StepResults />}
           </div>
           {/* QR code hover */}
-          <div className="fixed top-5 right-10 z-50 group">
+          <div className="fixed top-5 right-4 sm:right-10 z-50 group">
             <span className="text-xs text-muted-foreground cursor-default select-none">
               关注@阿真Irene
             </span>
@@ -93,7 +98,7 @@ export default function Home() {
           {showTop && (
             <button
               onClick={() => mainRef.current?.scrollTo({ top: 0, behavior: "smooth" })}
-              className="fixed bottom-6 right-10 z-50 h-10 w-10 rounded-full bg-foreground text-background flex items-center justify-center shadow-lg hover:opacity-80 transition-opacity"
+              className="fixed bottom-6 right-4 sm:right-10 z-50 h-10 w-10 rounded-full bg-foreground text-background flex items-center justify-center shadow-lg hover:opacity-80 transition-opacity"
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3L3 8h3v5h4V8h3L8 3z" fill="currentColor"/></svg>
             </button>
