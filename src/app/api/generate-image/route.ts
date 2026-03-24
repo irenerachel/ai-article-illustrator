@@ -115,8 +115,17 @@ async function generateFal(prompt: string, model: string, aspectRatio: string, a
     }
 
     const data = await res.json();
-    if (data.images?.[0]?.url) return data.images[0].url;
-    if (data.output?.[0]) return data.output[0];
+    const editImgUrl = data.images?.[0]?.url || data.output?.[0];
+    if (editImgUrl && !editImgUrl.startsWith("data:")) {
+      try {
+        const imgRes = await fetch(editImgUrl);
+        const buffer = await imgRes.arrayBuffer();
+        const base64 = Buffer.from(buffer).toString("base64");
+        const contentType = imgRes.headers.get("content-type") || "image/png";
+        return `data:${contentType};base64,${base64}`;
+      } catch { return editImgUrl; }
+    }
+    if (editImgUrl) return editImgUrl;
     throw new Error("未获取到图片");
   }
 
