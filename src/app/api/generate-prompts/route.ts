@@ -134,10 +134,14 @@ export async function POST(req: NextRequest) {
 
     const userPrompt = `你是一位资深的视觉导演和 AI 绘画提示词专家。你的任务是为文章的每个段落构思一个最能传达该段落核心意境的画面，并输出精准的绘画提示词。
 
-## 风格锁定
-${styleLock}
+## 风格锁定（最高优先级）
+视觉风格：${styleConfig.visualStyle}
+色彩基调：${styleConfig.colorTone}
+画面比例：${styleConfig.aspectRatio}
 
-## 画面比例: ${styleConfig.aspectRatio}
+⚠️ 极其重要：每一条提示词都必须在开头明确包含"${styleConfig.visualStyle}"这个风格关键词。
+例如如果风格是"毛毡风格"，则每条提示词必须以"毛毡风格，"开头；如果是"3D皮克斯"，则以"3D皮克斯风格，"开头。
+这是强制要求，不可省略。
 ${skillInstructions}${subjectInstructions}${infographicInstructions}
 
 ## 文章段落
