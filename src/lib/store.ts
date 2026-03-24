@@ -13,6 +13,7 @@ export type AppAction =
   | { type: "SET_SEGMENTS"; segments: Segment[]; styleLock: string }
   | { type: "UPDATE_SEGMENT"; id: string; updates: Partial<Segment> }
   | { type: "ADD_SEGMENT"; segment: Segment }
+  | { type: "SPLIT_SEGMENT"; id: string; newSegments: Segment[] }
   | { type: "DELETE_SEGMENT"; id: string }
   | { type: "SET_ERROR"; error: string | null }
   | { type: "SET_LANG"; lang: Lang }
@@ -106,6 +107,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     case "SET_SEGMENTS": return { ...state, segments: action.segments, styleLock: action.styleLock, step: 4 };
     case "ADD_SEGMENT": return { ...state, segments: [...state.segments, action.segment] };
     case "UPDATE_SEGMENT": return { ...state, segments: state.segments.map(s => s.id === action.id ? { ...s, ...action.updates } : s) };
+    case "SPLIT_SEGMENT": { const idx = state.segments.findIndex(s => s.id === action.id); if (idx === -1) return state; const segs = [...state.segments]; segs.splice(idx, 1, ...action.newSegments); return { ...state, segments: segs }; }
     case "DELETE_SEGMENT": return { ...state, segments: state.segments.filter(s => s.id !== action.id) };
     case "SET_ERROR": return { ...state, error: action.error, isSegmenting: false, isGeneratingPrompts: false };
     case "SET_LANG": persist("av_lang", action.lang); return { ...state, lang: action.lang };

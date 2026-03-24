@@ -5,7 +5,7 @@ import { Segment, ASPECT_RATIOS, EXTENDED_RATIOS, getImageModelProvider } from "
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Copy, Check, Pencil, Trash2, ChevronDown, ChevronUp, ImageIcon, Loader2, RefreshCw, AlertCircle, Download, User } from "lucide-react";
+import { Copy, Check, Pencil, Trash2, ChevronDown, ChevronUp, ImageIcon, Loader2, RefreshCw, AlertCircle, Download, User, SplitSquareHorizontal } from "lucide-react";
 
 export function SegmentCard({ segment, index, total }: { segment: Segment; index: number; total: number }) {
   const { state, dispatch } = useApp();
@@ -18,9 +18,66 @@ export function SegmentCard({ segment, index, total }: { segment: Segment; index
   const [lightbox, setLightbox] = useState(false);
   const useSubject = segment.useSubject ?? false;
   const setUseSubject = (v: boolean) => dispatch({ type: "UPDATE_SEGMENT", id: segment.id, updates: { useSubject: v } });
+  const [isSplitting, setIsSplitting] = useState(false);
   const hasImageKey = !!state.apiConfig.imageApiKey;
   const hasSubject = !!(state.subjectPrompt && state.subjectImageDataUrl);
   const dimmed = !segment.shouldIllustrate;
+
+  const handleSplit = async () => {
+    if (!segment.prompt) return;
+    setIsSplitting(true);
+    try {
+      const providerUrls: Record<string, string> = { volcengine: "https://ark.cn-beijing.volces.com/api/v3", deepseek: "https://api.deepseek.com", qwen: "https://dashscope.aliyuncs.com/compatible-mode/v1", moonshot: "https://api.moonshot.cn/v1", zhipu: "https://open.bigmodel.cn/api/paas/v4", openrouter: "https://openrouter.ai/api/v1" };
+      const prov = state.textModel.includes("/") ? "openrouter" : state.textModel.startsWith("claude-") ? "anthropic" : state.textModel.startsWith("doubao-") ? "volcengine" : state.textModel.startsWith("deepseek-") ? "deepseek" : state.textModel.startsWith("qwen-") ? "qwen" : state.textModel.startsWith("moonshot-") || state.textModel.startsWith("kimi-") ? "moonshot" : state.textModel.startsWith("glm-") ? "zhipu" : "volcengine";
+
+      const prompt = `这是一条 AI 绘画提示词，它描述的画面中包含多个独立的主体或场景。请把它拆分成多条独立的提示词，每条只描述一个主体/一个场景。保持原有的风格、光影、色调描述，只拆分主体。
+
+原始提示词：${segment.prompt}
+
+原始文本：${segment.text}
+
+返回 JSON 数组，每个元素：{"text": "对应的文本片段", "prompt": "拆分后的提示词", "sceneTag": "场景标签", "emotionTag": "情绪标签"}
+只返回 JSON 数组。`;
+
+      let responseText: string;
+      if (prov === "anthropic") {
+        const res = await fetch("/api/segment", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ articleText: prompt, apiKey: state.apiConfig.textApiKey, textModel: state.textModel }) });
+        const data = await res.json();
+        responseText = JSON.stringify(data.segments || []);
+      } else {
+        const baseUrl = providerUrls[prov];
+        const res = await fetch(`${baseUrl}/chat/completions`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${state.apiConfig.textApiKey}` },
+          body: JSON.stringify({ model: state.textModel, messages: [{ role: "user", content: prompt }], max_tokens: 2048 }),
+        });
+        if (!res.ok) throw new Error("拆分失败");
+        const data = await res.json();
+        responseText = data.choices?.[0]?.message?.content || "";
+      }
+
+      let jsonText = responseText.trim();
+      const jsonMatch = jsonText.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (jsonMatch) jsonText = jsonMatch[1].trim();
+      const arrMatch = jsonText.match(/\[[\s\S]*\]/);
+      if (arrMatch) {
+        const parts: { text: string; prompt: string; sceneTag: string; emotionTag: string }[] = JSON.parse(arrMatch[0]);
+        if (parts.length > 1) {
+          const newSegs = parts.map((p, i) => ({
+            id: `${segment.id}-split-${i}`,
+            text: p.text || segment.text,
+            prompt: p.prompt,
+            sceneTag: p.sceneTag || segment.sceneTag,
+            emotionTag: p.emotionTag || segment.emotionTag,
+            shouldIllustrate: true,
+          }));
+          dispatch({ type: "SPLIT_SEGMENT", id: segment.id, newSegments: newSegs });
+        }
+      }
+    } catch {} finally {
+      setIsSplitting(false);
+    }
+  };
 
   const handleCopy = async () => { await navigator.clipboard.writeText(segment.prompt); setCopied(true); setTimeout(() => setCopied(false), 2000); };
   const handleSave = () => { dispatch({ type: "UPDATE_SEGMENT", id: segment.id, updates: { prompt: editPrompt } }); setEditing(false); };
@@ -51,6 +108,11 @@ export function SegmentCard({ segment, index, total }: { segment: Segment; index
 
         </div>
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          {segment.prompt && !segment.imageUrl && (
+            <Button variant="ghost" size="icon" className="h-7 w-7" title={lang === "zh" ? "拆分为多个场景" : "Split into scenes"} onClick={handleSplit} disabled={isSplitting}>
+              {isSplitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <SplitSquareHorizontal className="h-3.5 w-3.5" />}
+            </Button>
+          )}
           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setCollapsed(!collapsed)}>{collapsed ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}</Button>
           <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => dispatch({ type: "DELETE_SEGMENT", id: segment.id })}><Trash2 className="h-3.5 w-3.5" /></Button>
         </div>
