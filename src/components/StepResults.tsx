@@ -424,6 +424,9 @@ export function StepResults() {
                     {isSmartAssigning ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Wand2 className="h-3.5 w-3.5" />}
                     {lang === "zh" ? "智能分配主体" : "Smart Assign"}
                   </button>
+                  {isSmartAssigning && (
+                    <p className="text-[11px] text-muted-foreground">{lang === "zh" ? "AI 正在逐条分析提示词，判断哪些画面需要主体出镜..." : "AI is analyzing each prompt..."}</p>
+                  )}
                 </>
               ) : (
                 <p className="text-xs text-muted-foreground">{lang === "zh" ? "主体已上传，但描述为空。请手动输入或重新上传。" : "Subject uploaded but no description."}</p>
