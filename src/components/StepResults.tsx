@@ -67,7 +67,11 @@ export function StepResults() {
   };
 
   const handleSmartAssignSubject = async () => {
-    if (!state.subjectPrompt || state.segments.length === 0) return;
+    if (state.segments.length === 0) return;
+    if (!state.subjectPrompt) {
+      dispatch({ type: "SET_ERROR", error: lang === "zh" ? "请先上传主体图片并等待 AI 分析完成，或手动输入主体描述" : "Please upload a subject image first or enter a description" });
+      return;
+    }
     setIsSmartAssigning(true);
     try {
       const res = await fetch("/api/assign-subject", {
