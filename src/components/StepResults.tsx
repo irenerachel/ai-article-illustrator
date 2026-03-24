@@ -123,11 +123,21 @@ export function StepResults() {
 
   const pendingSegments = state.segments.filter(s => s.prompt && !s.imageUrl && !s.isGeneratingImage && s.shouldIllustrate !== false);
   const isAnyGenerating = state.segments.some(s => s.isGeneratingImage);
+  const cancelRef = useRef(false);
+  const [isBatchGenerating, setIsBatchGenerating] = useState(false);
 
   const handleGenerateAllImages = async () => {
+    cancelRef.current = false;
+    setIsBatchGenerating(true);
     for (const seg of pendingSegments) {
+      if (cancelRef.current) break;
       await generateOneImage(seg);
     }
+    setIsBatchGenerating(false);
+  };
+
+  const handleCancelBatch = () => {
+    cancelRef.current = true;
   };
 
   const handleGenerateNextImage = async () => {
@@ -317,9 +327,14 @@ export function StepResults() {
             {selectedModel && <Badge variant="outline" className="text-xs rounded-lg">{selectedModel.name}</Badge>}
           </div>
           <div className="flex items-center gap-2">
-            {hasImageKey && pendingSegments.length > 0 && (
+            {hasImageKey && pendingSegments.length > 0 && !isBatchGenerating && (
               <Button size="sm" className="rounded-lg bg-foreground text-background hover:opacity-90" disabled={isAnyGenerating} onClick={handleGenerateAllImages}>
                 <ImageIcon className="h-3.5 w-3.5 mr-1.5" />{lang === "zh" ? "生成全部配图" : "Generate All"}
+              </Button>
+            )}
+            {isBatchGenerating && (
+              <Button size="sm" variant="outline" className="rounded-lg border-destructive text-destructive hover:bg-destructive/10" onClick={handleCancelBatch}>
+                <X className="h-3.5 w-3.5 mr-1.5" />{lang === "zh" ? "取消生成" : "Cancel"}
               </Button>
             )}
             {imagesWithUrl.length > 0 && (
