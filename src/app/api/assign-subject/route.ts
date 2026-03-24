@@ -35,14 +35,21 @@ export async function POST(req: NextRequest) {
     const segList = segments.map((s: { id: string; prompt: string }) => `ID: ${s.id}\n提示词: ${s.prompt}`).join("\n\n");
 
     const prompt = `你是一位配图编导。以下是一组配图提示词，以及一个参考主体的描述。
-请判断哪些画面中应该出现这个主体（如与主体相关的场景、互动画面），哪些不需要（如纯空镜、远景风光、物品特写、抽象概念画面）。
 
 参考主体：${subjectPrompt}
+
+你的任务：判断每个画面是否应该出现这个主体。
+
+判断原则（倾向于选中）：
+- 只要画面中可以合理出现人物/角色/动物，就应该选中（useSubject: true）
+- 即使提示词没有明确提到人物，只要场景适合主体出现（如街道、房间、自然场景），也应该选中
+- 只有纯粹的物品微距特写、纯抽象图形、纯文字信息图这类完全不适合放主体的画面，才设为 false
+- 大约 70-80% 的画面应该包含主体
 
 提示词列表：
 ${segList}
 
-返回 JSON 数组，每个元素：{"id": "段落ID", "useSubject": true/false}
+返回 JSON 数组，每个元素：{"id": "段落ID", "useSubject": true或false}
 只返回 JSON 数组。`;
 
     let responseText: string;
