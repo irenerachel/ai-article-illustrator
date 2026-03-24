@@ -87,7 +87,13 @@ export function SegmentCard({ segment, index, total }: { segment: Segment; index
     try {
       const ratio = state.customRatio ? localRatio : state.styleConfig.aspectRatio;
       let fullPrompt = segment.prompt;
-      if (state.skillText) fullPrompt += `\n\n风格参考：${state.skillText}`;
+      if (state.skillText) {
+        // Deduplicate: only append parts of style reference not already in prompt
+        const promptLower = segment.prompt.toLowerCase();
+        const styleSegments = state.skillText.split(/[，。,.\n]+/).map(s => s.trim()).filter(s => s.length > 3);
+        const uniqueParts = styleSegments.filter(s => !promptLower.includes(s.toLowerCase()));
+        if (uniqueParts.length > 0) fullPrompt += `\n\n风格参考：${uniqueParts.join("，")}`;
+      }
       if (hasSubject && useSubject) fullPrompt += `\n\n参考主体：${state.subjectPrompt}`;
       const refImageDataUrl = hasSubject && useSubject ? state.subjectImageDataUrl : undefined;
       const res = await fetch("/api/generate-image", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt: fullPrompt, model: state.styleConfig.imageModel, aspectRatio: ratio, apiKey: state.apiConfig.imageApiKey, refImageDataUrl, watermark: state.watermark, resolution: state.imageResolution }) });

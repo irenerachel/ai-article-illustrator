@@ -115,7 +115,12 @@ export function StepResults() {
     dispatch({ type: "UPDATE_SEGMENT", id: seg.id, updates: { isGeneratingImage: true, imageError: undefined } });
     try {
       let prompt = seg.prompt;
-      if (state.skillText) prompt += `\n\n风格参考：${state.skillText}`;
+      if (state.skillText) {
+        const promptLower = seg.prompt.toLowerCase();
+        const styleSegments = state.skillText.split(/[，。,.\n]+/).map(s => s.trim()).filter(s => s.length > 3);
+        const uniqueParts = styleSegments.filter(s => !promptLower.includes(s.toLowerCase()));
+        if (uniqueParts.length > 0) prompt += `\n\n风格参考：${uniqueParts.join("，")}`;
+      }
       const res = await fetch("/api/generate-image", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt, model: state.styleConfig.imageModel, aspectRatio: state.styleConfig.aspectRatio, apiKey: state.apiConfig.imageApiKey, watermark: state.watermark, resolution: state.imageResolution }) });
       if (!res.ok) { const err = await res.json(); throw new Error(err.error); }
       const { imageUrl } = await res.json();
