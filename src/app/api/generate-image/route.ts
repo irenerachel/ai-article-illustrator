@@ -69,19 +69,8 @@ async function generateVolcengine(prompt: string, model: string, aspectRatio: st
   }
 
   const data = await res.json();
-  const imgUrl = data.data?.[0]?.url;
-  if (!imgUrl) throw new Error("未获取到图片");
-
-  // Convert remote URL to base64 data URI for persistence
-  try {
-    const imgRes = await fetch(imgUrl);
-    const buffer = await imgRes.arrayBuffer();
-    const base64 = Buffer.from(buffer).toString("base64");
-    const contentType = imgRes.headers.get("content-type") || "image/png";
-    return `data:${contentType};base64,${base64}`;
-  } catch {
-    return imgUrl; // fallback to URL if conversion fails
-  }
+  if (data.data?.[0]?.url) return data.data[0].url;
+  throw new Error("未获取到图片");
 }
 
 async function generateFal(prompt: string, model: string, aspectRatio: string, apiKey: string, refImageDataUrl?: string, resolution?: string) {
@@ -115,17 +104,8 @@ async function generateFal(prompt: string, model: string, aspectRatio: string, a
     }
 
     const data = await res.json();
-    const editImgUrl = data.images?.[0]?.url || data.output?.[0];
-    if (editImgUrl && !editImgUrl.startsWith("data:")) {
-      try {
-        const imgRes = await fetch(editImgUrl);
-        const buffer = await imgRes.arrayBuffer();
-        const base64 = Buffer.from(buffer).toString("base64");
-        const contentType = imgRes.headers.get("content-type") || "image/png";
-        return `data:${contentType};base64,${base64}`;
-      } catch { return editImgUrl; }
-    }
-    if (editImgUrl) return editImgUrl;
+    if (data.images?.[0]?.url) return data.images[0].url;
+    if (data.output?.[0]) return data.output[0];
     throw new Error("未获取到图片");
   }
 
@@ -152,17 +132,8 @@ async function generateFal(prompt: string, model: string, aspectRatio: string, a
   }
 
   const data = await res.json();
-  const imgUrl = data.images?.[0]?.url || data.output?.[0];
-  if (imgUrl && !imgUrl.startsWith("data:")) {
-    try {
-      const imgRes = await fetch(imgUrl);
-      const buffer = await imgRes.arrayBuffer();
-      const base64 = Buffer.from(buffer).toString("base64");
-      const contentType = imgRes.headers.get("content-type") || "image/png";
-      return `data:${contentType};base64,${base64}`;
-    } catch { return imgUrl; }
-  }
-  if (imgUrl) return imgUrl;
+  if (data.images?.[0]?.url) return data.images[0].url;
+  if (data.output?.[0]) return data.output[0];
   throw new Error("未获取到图片");
 }
 

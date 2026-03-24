@@ -102,6 +102,16 @@ export function SegmentCard({ segment, index, total }: { segment: Segment; index
       const history = [...(segment.imageHistory || [])];
       if (segment.imageUrl) history.push(segment.imageUrl);
       dispatch({ type: "UPDATE_SEGMENT", id: segment.id, updates: { imageUrl, imageHistory: history, isGeneratingImage: false } });
+      // Background: convert remote URL to base64 for persistence
+      if (imageUrl && !imageUrl.startsWith("data:")) {
+        fetch("/api/proxy-image?" + new URLSearchParams({ url: imageUrl }))
+          .then(r => r.blob())
+          .then(blob => {
+            const reader = new FileReader();
+            reader.onload = () => { if (reader.result) dispatch({ type: "UPDATE_SEGMENT", id: segment.id, updates: { imageUrl: reader.result as string } }); };
+            reader.readAsDataURL(blob);
+          }).catch(() => {});
+      }
     } catch (e) { dispatch({ type: "UPDATE_SEGMENT", id: segment.id, updates: { isGeneratingImage: false, imageError: e instanceof Error ? e.message : "失败" } }); }
   };
 
