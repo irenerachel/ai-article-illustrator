@@ -1,0 +1,8 @@
+#!/bin/bash
+DIR="$(cd "$(dirname "$0")/../../.." && pwd)"
+cd "$DIR"
+
+osascript -e "tell application \"Terminal\"
+    activate
+    do script \"cd '$DIR' && clear && echo '' && echo '  AI Article Illustrator · 全文配图生成器' && echo '' && if [ ! -d node_modules ]; then echo '  Installing dependencies...' && npm install; fi && echo '  Starting...' && echo '  Open http://localhost:3000' && echo '' && npm run dev\"
+end tell"
