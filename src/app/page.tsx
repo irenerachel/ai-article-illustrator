@@ -15,6 +15,13 @@ export default function Home() {
 
   useEffect(() => {
     try {
+      // Auto-cleanup: remove oversized cached data to prevent page freeze
+      const segsRaw = localStorage.getItem("av_segments");
+      if (segsRaw && segsRaw.length > 2 * 1024 * 1024) {
+        localStorage.removeItem("av_segments");
+        localStorage.removeItem("av_style_lock");
+      }
+
       const api = localStorage.getItem("av_api");
       if (api) dispatch({ type: "SET_API_CONFIG", config: JSON.parse(api) });
       const lang = localStorage.getItem("av_lang");
