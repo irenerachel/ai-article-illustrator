@@ -169,8 +169,8 @@ ${segDescs}
 
 ## 每条提示词必须包含的要素（缺一不可）
 1. 风格关键词（开头）：${styleConfig.visualStyle}
-2. 色彩基调：${styleConfig.colorTone === "正常" ? "自然色彩" : styleConfig.colorTone}${infographicMode ? "\n3. 如果该段落适合信息图，在提示词中注明"信息图风格"" : ""}${skillText ? "\n" + (infographicMode ? "4" : "3") + ". 风格参考中的关键风格特征" : ""}
-
+2. 色彩基调：${styleConfig.colorTone === "正常" ? "自然色彩" : styleConfig.colorTone}
+${infographicMode ? "3. 如果该段落适合信息图，在提示词中注明【信息图风格】\n" : ""}${skillText ? (infographicMode ? "4" : "3") + ". 风格参考中的关键风格特征\n" : ""}
 ## 提示词结构
 [${styleConfig.visualStyle}风格] + [色调：${styleConfig.colorTone === "正常" ? "自然" : styleConfig.colorTone}] + [画面主体] + [场景环境] + [光影氛围] + [材质质感]
 
