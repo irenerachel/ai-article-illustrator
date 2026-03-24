@@ -4,7 +4,7 @@ import { IMAGE_MODELS } from "@/lib/types";
 import { SegmentCard } from "./SegmentCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ImageIcon, Download, Copy, Check, FileDown, Plus, TextSelect, Wand2, Loader2, Images, Upload, X, User } from "lucide-react";
+import { ArrowLeft, ImageIcon, Download, Copy, Check, FileDown, Plus, TextSelect, Wand2, Loader2, Images, Upload, X, User, RefreshCw } from "lucide-react";
 import { useState, useRef, useCallback } from "react";
 import JSZip from "jszip";
 
@@ -337,6 +337,14 @@ export function StepResults() {
             {hasImageKey && pendingSegments.length > 0 && !isBatchGenerating && (
               <Button size="sm" className="rounded-lg bg-foreground text-background hover:opacity-90" disabled={isAnyGenerating} onClick={handleGenerateAllImages}>
                 <ImageIcon className="h-3.5 w-3.5 mr-1.5" />{lang === "zh" ? "生成全部配图" : "Generate All"}
+              </Button>
+            )}
+            {hasImageKey && pendingSegments.length === 0 && imagesWithUrl.length > 0 && !isBatchGenerating && (
+              <Button size="sm" variant="outline" className="rounded-lg" disabled={isAnyGenerating} onClick={() => {
+                state.segments.forEach(s => { if (s.imageUrl) dispatch({ type: "UPDATE_SEGMENT", id: s.id, updates: { imageUrl: undefined, imageError: undefined } }); });
+                setTimeout(() => handleGenerateAllImages(), 100);
+              }}>
+                <RefreshCw className="h-3.5 w-3.5 mr-1.5" />{lang === "zh" ? "重新生成全部" : "Regenerate All"}
               </Button>
             )}
             {isBatchGenerating && (
