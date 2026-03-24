@@ -114,7 +114,9 @@ export function StepResults() {
   const generateOneImage = async (seg: typeof state.segments[0]) => {
     dispatch({ type: "UPDATE_SEGMENT", id: seg.id, updates: { isGeneratingImage: true, imageError: undefined } });
     try {
-      const res = await fetch("/api/generate-image", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt: seg.prompt, model: state.styleConfig.imageModel, aspectRatio: state.styleConfig.aspectRatio, apiKey: state.apiConfig.imageApiKey, watermark: state.watermark, resolution: state.imageResolution }) });
+      let prompt = seg.prompt;
+      if (state.skillText) prompt += `\n\n风格参考：${state.skillText}`;
+      const res = await fetch("/api/generate-image", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt, model: state.styleConfig.imageModel, aspectRatio: state.styleConfig.aspectRatio, apiKey: state.apiConfig.imageApiKey, watermark: state.watermark, resolution: state.imageResolution }) });
       if (!res.ok) { const err = await res.json(); throw new Error(err.error); }
       const { imageUrl } = await res.json();
       dispatch({ type: "UPDATE_SEGMENT", id: seg.id, updates: { imageUrl, isGeneratingImage: false } });
