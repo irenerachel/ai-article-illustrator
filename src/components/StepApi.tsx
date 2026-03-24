@@ -168,7 +168,7 @@ export function StepApi() {
             {textProvider === "volcengine" && imageProvider === "volcengine" && (
               <p className="text-[11px] text-muted-foreground">
                 {lang === "zh"
-                  ? "💡 文本和图片都使用火山引擎，如密钥相同可留空，将自动复用文本密钥。"
+                  ? "💡 默认文本和图片都使用火山引擎，如密钥相同可留空，将自动复用文本密钥。"
                   : "💡 Same platform. Leave empty to reuse the text API key."}
               </p>
             )}

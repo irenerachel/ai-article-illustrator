@@ -1,5 +1,5 @@
 "use client";
-import { useReducer, useEffect, useState } from "react";
+import { useReducer, useEffect, useState, useRef, useCallback } from "react";
 import { AppContext, appReducer, initialState } from "@/lib/store";
 import { TEXT_MODELS } from "@/lib/types";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -41,13 +41,20 @@ export default function Home() {
     setReady(true);
   }, []);
 
+  const mainRef = useRef<HTMLElement>(null);
+  const [showTop, setShowTop] = useState(false);
+
+  const handleScroll = useCallback(() => {
+    setShowTop((mainRef.current?.scrollTop ?? 0) > 300);
+  }, []);
+
   if (!ready) return null;
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>
       <div className="flex h-screen overflow-hidden">
         <AppSidebar />
-        <main className="flex-1 overflow-y-auto relative">
+        <main ref={mainRef} onScroll={handleScroll} className="flex-1 overflow-y-auto relative">
           <SubtleDots />
           <div className="max-w-[900px] mx-auto px-8 py-10 relative" style={{ zIndex: 1 }}>
             {state.step === 1 && <StepApi />}
@@ -69,6 +76,15 @@ export default function Home() {
               </div>
             </div>
           </div>
+          {/* Back to top */}
+          {showTop && (
+            <button
+              onClick={() => mainRef.current?.scrollTo({ top: 0, behavior: "smooth" })}
+              className="fixed bottom-6 right-6 z-50 h-10 w-10 rounded-full bg-foreground text-background flex items-center justify-center shadow-lg hover:opacity-80 transition-opacity"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3L3 8h3v5h4V8h3L8 3z" fill="currentColor"/></svg>
+            </button>
+          )}
         </main>
       </div>
     </AppContext.Provider>

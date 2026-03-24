@@ -99,7 +99,9 @@ export function SegmentCard({ segment, index, total }: { segment: Segment; index
       const res = await fetch("/api/generate-image", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt: fullPrompt, model: state.styleConfig.imageModel, aspectRatio: ratio, apiKey: state.apiConfig.imageApiKey, refImageDataUrl, watermark: state.watermark, resolution: state.imageResolution }) });
       if (!res.ok) { const err = await res.json(); throw new Error(err.error); }
       const { imageUrl } = await res.json();
-      dispatch({ type: "UPDATE_SEGMENT", id: segment.id, updates: { imageUrl, isGeneratingImage: false } });
+      const history = [...(segment.imageHistory || [])];
+      if (segment.imageUrl) history.push(segment.imageUrl);
+      dispatch({ type: "UPDATE_SEGMENT", id: segment.id, updates: { imageUrl, imageHistory: history, isGeneratingImage: false } });
     } catch (e) { dispatch({ type: "UPDATE_SEGMENT", id: segment.id, updates: { isGeneratingImage: false, imageError: e instanceof Error ? e.message : "失败" } }); }
   };
 
@@ -164,6 +166,30 @@ export function SegmentCard({ segment, index, total }: { segment: Segment; index
                 </Button>
               </div>
             </div>
+            {/* Image history */}
+            {segment.imageHistory && segment.imageHistory.length > 0 && (
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-[10px] text-muted-foreground shrink-0">{lang === "zh" ? "历史" : "History"}:</span>
+                <div className="flex gap-1.5 overflow-x-auto">
+                  {segment.imageHistory.map((url, i) => (
+                    <button
+                      key={i}
+                      onClick={() => {
+                        const newHistory = segment.imageHistory!.filter((_, j) => j !== i);
+                        newHistory.push(segment.imageUrl!);
+                        dispatch({ type: "UPDATE_SEGMENT", id: segment.id, updates: { imageUrl: url, imageHistory: newHistory } });
+                      }}
+                      className="shrink-0 rounded-md border-2 border-transparent hover:border-foreground transition-colors"
+                    >
+                      <img src={url} alt={`v${i + 1}`} className="w-12 h-12 rounded-md object-cover" />
+                    </button>
+                  ))}
+                  <div className="shrink-0 rounded-md border-2 border-foreground">
+                    <img src={segment.imageUrl} alt="current" className="w-12 h-12 rounded-md object-cover" />
+                  </div>
+                </div>
+              </div>
+            )}
             {/* Lightbox */}
             {lightbox && (
               <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center cursor-pointer" onClick={() => setLightbox(false)}>

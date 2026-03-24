@@ -40,6 +40,7 @@ export interface Segment {
   prompt: string;
   isGeneratingImage?: boolean;
   imageUrl?: string;
+  imageHistory?: string[];
   imageError?: string;
   shouldIllustrate?: boolean;
   useSubject?: boolean;
